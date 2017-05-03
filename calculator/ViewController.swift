@@ -24,7 +24,6 @@ class ViewController: UIViewController {
             display.text = digit
             userIsInTheMiddleOfTyping = true
         }
-        
     }
     
     var displayValue: Double {
@@ -36,21 +35,20 @@ class ViewController: UIViewController {
         }
     }
     
+    private var brain = CalculatorBrain()
+    
     @IBAction func performOperation(_ sender: UIButton) {
-        userIsInTheMiddleOfTyping = false
-        if let mathematicalSymbal = sender.currentTitle {
-            switch mathematicalSymbal {
-            case "π":
-                displayValue = Double.pi
-                case "√":
-                displayValue = sqrt(displayValue)
-            default:
-                break
-            }
+        if userIsInTheMiddleOfTyping {
+            brain.setOperand(displayValue)
+            userIsInTheMiddleOfTyping = false
         }
+        if let mathematicalSymbal = sender.currentTitle {
+            brain.performOperation(mathematicalSymbal)
+        }
+        if brain.result != nil {
+            displayValue = brain.result!
+        }
+        
     }
-
-
-
 }
 
