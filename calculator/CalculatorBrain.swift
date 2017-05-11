@@ -8,16 +8,28 @@
 
 import Foundation
 
+func createFloat(op1: Double, op2: Double) -> Double {
+    return op1 + Double("0.\(Int(op2))")!
+    
+}
+
 struct CalculatorBrain {
     
     private var accumulator: Double?
+    
+    var accumValue: Double? {
+        return accumulator
+    }
     
     private enum Operation {
         case constant(Double)
         case unaryOperation((Double) -> Double)
         case binaryOperation((Double,Double) -> Double)
+//        case float((Double,Double) -> Double)
         case equals
     }
+    
+
     
     private var operations: Dictionary<String,Operation> =
     [
@@ -30,6 +42,7 @@ struct CalculatorBrain {
         "÷" : Operation.binaryOperation({ $0 / $1 }),
         "-" : Operation.binaryOperation({ $0 - $1 }),
         "+" : Operation.binaryOperation({ $0 + $1 }),
+//        "." : Operation.float(createFloat),
         "=" : Operation.equals
         
     ]
@@ -49,9 +62,15 @@ struct CalculatorBrain {
                     pendingBinaryOperation = PendingBinaryOperation(function: function, firstOperand: accumulator!)
                     accumulator = nil
                 }
+//            case .float(let function):
+//                if accumulator != nil {
+//                    pendingBinaryOperation = PendingBinaryOperation(function: function, firstOperand: accumulator!)
+// //                   accumulator = nil
+//                }
                 
             case .equals:
                 performPendingBinaryOperation()
+                accumulator = nil
 
             }
         }

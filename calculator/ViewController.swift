@@ -12,17 +12,43 @@ class ViewController: UIViewController {
 
 
     @IBOutlet weak var display: UILabel!
+//    @IBOutlet weak var displayDescription: UILabel!
     
+    var runningDisplayDescription: String = ""
     var userIsInTheMiddleOfTyping = false
+    
+    private func showSizeClasses() {
+        if !userIsInTheMiddleOfTyping {
+            display.textAlignment = .center
+            display.text = "width " + traitCollection.horizontalSizeClass.description + " height " + traitCollection.verticalSizeClass.description
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        showSizeClasses()
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: { coordinator in
+            self.showSizeClasses()
+        }, completion: nil)
+    }
+    
+    
     
     @IBAction func touchDigit(_ sender: UIButton) {
         let digit = sender.currentTitle!
         if userIsInTheMiddleOfTyping {
             let textCurrentlyInDisplay = display.text
             display.text = textCurrentlyInDisplay! + digit
+
         } else {
             display.text = digit
             userIsInTheMiddleOfTyping = true
+            runningDisplayDescription += String(displayValue)
+//            displayDescription.text = runningDisplayDescription
         }
     }
     
@@ -38,17 +64,41 @@ class ViewController: UIViewController {
     private var brain = CalculatorBrain()
     
     @IBAction func performOperation(_ sender: UIButton) {
+        
         if userIsInTheMiddleOfTyping {
             brain.setOperand(displayValue)
             userIsInTheMiddleOfTyping = false
+
+//            runningDisplayDescription += String(displayValue)
+//            displayDescription.text = runningDisplayDescription
         }
         if let mathematicalSymbal = sender.currentTitle {
+            
+//            runningDisplayDescription += sender.currentTitle!
+//            displayDescription.text = runningDisplayDescription
+            
             brain.performOperation(mathematicalSymbal)
+            
+            if let v = brain.accumValue { print(v) }
         }
         if brain.result != nil {
             displayValue = brain.result!
+            
+            if let v = brain.accumValue { print(v) }
         }
         
+    }
+    
+
+}
+
+extension UIUserInterfaceSizeClass: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .compact: return "Compact"
+        case .regular: return "Regular"
+        case .unspecified: return "??"
+        }
     }
 }
 
